@@ -2,7 +2,7 @@ import 'mocha'
 import { expect } from 'chai'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import * as TestUtils from 'react-addons-test-utils'
+import * as TestUtils from 'react-dom/test-utils'
 import { App } from '../src/ui/App'
 
 describe('App', () => {
