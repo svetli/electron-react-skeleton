@@ -2,6 +2,7 @@
 ### Electron application skeleton based on React, Webpack.
 
 [![Build Status](https://travis-ci.org/svetli/electron-react-skeleton.svg?branch=master)](https://travis-ci.org/svetli/electron-react-skeleton)
+[![Build Status](https://ci.appveyor.com/api/projects/status/github/svetli/electron-react-skeleton?branch=master&svg=true)](https://ci.appveyor.com/project/svetli/electron-react-skeleton)
 
 ## Install
 ```bash
