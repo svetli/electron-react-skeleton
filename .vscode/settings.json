@@ -1,0 +1,20 @@
+{
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+        "**/node_modules": true,
+        ".awcache": true,
+        ".eslintcache": true
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/build": true,
+        "**/dist": true,
+        ".awcache": true
+    },
+    "typescript.tsdk": "./node_modules/typescript/lib"
+}

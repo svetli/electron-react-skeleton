@@ -1,0 +1,75 @@
+#!/usr/bin/env node
+
+'use strict'
+
+const webpack = require('webpack')
+const webpackDevMiddleware = require('webpack-dev-middleware')
+const webpackHotMiddleware = require('webpack-hot-middleware')
+const express = require('express')
+const electron = require('electron')
+const mri = require('mri')
+const chalk = require('chalk')
+const childProcess = require('child_process')
+const runElectron = require('./run-electron')
+const [mainConfig, rendererConfig] = require('../webpack/webpack.development')
+
+/**
+ * Setup environment
+ */
+const args = mri(process.argv.slice(2))
+const port = args.port || process.env.PORT || 3000
+const host = args.host || 'localhost'
+const mode = args.mode || process.env.NODE_ENV || 'production'
+
+if (mode === 'development') {
+  /**
+   * Application
+   */
+  const server = express()
+  const compiler = webpack(rendererConfig)
+
+  /**
+   * Webpack development middleware
+   *
+   * @see https://github.com/webpack/webpack-dev-middleware
+   */
+  server.use(
+    webpackDevMiddleware(compiler, {
+      /**
+       * Public path to bind the middleware
+       */
+      publicPath: rendererConfig.output.publicPath,
+
+      /**
+       * Display no info to console (only warnings and errors)
+       */
+      noInfo: true,
+    })
+  )
+
+  /**
+   * Webpack hot reloading middleware
+   *
+   * @see https://github.com/glenjamin/webpack-hot-middleware
+   */
+  server.use(webpackHotMiddleware(compiler))
+
+  /**
+   * Start listening...
+   */
+  server.listen(port, host, error => {
+    if (error) {
+      return console.error(chalk.red(error))
+    }
+
+    console.log(`
+        ${chalk.bold('Access URLs:')}
+            Localhost: ${chalk.magenta(`http://${host}:${port}`)}
+            ${chalk.blue(`Press ${chalk.italic('CTRL-C')} to stop`)}
+    `)
+
+    runElectron()
+  })
+} else {
+  runElectron()
+}
