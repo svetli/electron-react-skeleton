@@ -1,0 +1,40 @@
+version: "{build}"
+
+skip_tags: true
+
+os: Visual Studio 2015
+
+platform:
+  - x64
+
+environment:
+  nodejs_version: "8.9.4"
+
+cache:
+  - .eslintcache
+  - node_modules
+  - '%USERPROFILE%\.electron'
+  - '%LOCALAPPDATA%\Yarn'
+
+branches:
+  only:
+    - master
+
+install:
+  - ps: Install-Product node $env:nodejs_version $env:platform
+  - yarn install --force
+
+build_script:
+  - yarn lint
+  - yarn build:prod
+
+test_script:
+  - node --version && npm --version
+  - npm test
+
+notifications:
+  - provider: Webhook
+    url: https://webhooks.gitter.im/e/a7093f240f43700a88fe
+    on_build_success: false
+    on_build_failure: true
+    on_build_status_changed: true
