@@ -1,7 +1,6 @@
 # Electron React Skeleton
 ### Electron application skeleton based on React, Webpack.
 
-<br />
 [![Build Status](https://travis-ci.org/svetli/electron-react-skeleton.svg?branch=master)](https://travis-ci.org/svetli/electron-react-skeleton)
 
 ## Install
@@ -29,6 +28,3 @@ To run test
 ```bash
 $ yarn run test
 ```
-
-[travis-image]: https://travis-ci.org/svetli/electron-react-skeleton.svg?branch=master
-[travis-url]: https://travis-ci.org/svetli/electron-react-skeleton
