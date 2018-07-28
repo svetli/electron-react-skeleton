@@ -9,6 +9,14 @@ const webpackRendererBase = require('./webpack.renderer')
  */
 const webpackMainConfig = webpackMerge({}, webpackMainBase, {
   /**
+   * Providing the mode configuration option tells webpack to use
+   * its built-in optimizations accordingly.
+   *
+   * @see https://webpack.js.org/concepts/mode
+   */
+  mode: 'development',
+
+  /**
    * This option controls if and how source maps are generated.
    *
    * @see https://webpack.js.org/configuration/devtool/#devtool
@@ -20,6 +28,14 @@ const webpackMainConfig = webpackMerge({}, webpackMainBase, {
  * Renderer development config
  */
 const webpackRendererConfig = webpackMerge({}, webpackRendererBase, {
+  /**
+   * Providing the mode configuration option tells webpack to use
+   * its built-in optimizations accordingly.
+   *
+   * @see https://webpack.js.org/concepts/mode
+   */
+  mode: 'development',
+
   /**
    * This option controls if and how source maps are generated.
    *

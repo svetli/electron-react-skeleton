@@ -161,12 +161,12 @@ function packageApplication() {
     },
   }
 
-  packager(pkgOptions, (error, paths) => {
-    if (error) {
+  packager(pkgOptions)
+    .then(paths => {
+      console.log(chalk`{green [BUILD] Successfully built to ${paths}}`)
+    })
+    .catch(error => {
       console.error(chalk`{red [BUILD] Failed with error ${error}}`)
       process.exit(1)
-    } else {
-      console.log(chalk`{green [BUILD] Successfully built to ${paths}}`)
-    }
-  })
+    })
 }

@@ -73,6 +73,7 @@ module.exports = {
             options: {
               useBabel: true,
               useCache: true,
+              babelCore: '@babel/core',
             },
           },
         ],
@@ -80,20 +81,6 @@ module.exports = {
       },
     ],
   },
-
-  /**
-   * A list of webpack plugins.
-   *
-   * @see https://webpack.js.org/configuration/plugins/#plugins
-   */
-  plugins: [
-    /**
-     * Skip the emitting phase whenever there are errors while compiling.
-     *
-     * @see https://webpack.js.org/plugins/no-emit-on-errors-plugin
-     */
-    new webpack.NoEmitOnErrorsPlugin(),
-  ],
 
   /**
    * The externals configuration option provides a way of excluding
