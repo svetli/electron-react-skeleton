@@ -1,19 +1,16 @@
 /**
  * Webpack production config
  */
-'use strict'
-
-const webpack = require('webpack')
-const webpackMerge = require('webpack-merge')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-
-const webpackBaseMain = require('./webpack.main')
-const webpackBaseRenderer = require('./webpack.renderer')
+import * as webpack from 'webpack'
+import * as webpackMerge from 'webpack-merge'
+import * as MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import { webpackMainBaseConfig } from './webpack.main'
+import { webpackRendererBaseConfig } from './webpack.renderer'
 
 /**
  * Base production configuration
  */
-const webpackBaseProduction = {
+const webpackBaseProductionConfig: webpack.Configuration = {
   /**
    * Providing the mode configuration option tells webpack to use
    * its built-in optimizations accordingly.
@@ -40,19 +37,19 @@ const webpackBaseProduction = {
 /**
  * Main production config
  */
-const webpackProductionMain = webpackMerge(
+const webpackProductionMainConfig: webpack.Configuration = webpackMerge(
   {},
-  webpackBaseMain,
-  webpackBaseProduction
+  webpackMainBaseConfig,
+  webpackBaseProductionConfig
 )
 
 /**
  * Renderer production config
  */
-const webpackProductionRenderer = webpackMerge(
+const webpackProductionRendererConfig: webpack.Configuration = webpackMerge(
   {},
-  webpackBaseRenderer,
-  webpackBaseProduction,
+  webpackRendererBaseConfig,
+  webpackBaseProductionConfig,
   {
     /**
      * These options determine how the different types of modules within a project will be treated.
@@ -106,4 +103,4 @@ const webpackProductionRenderer = webpackMerge(
 /**
  * Webpack multi-compiler mode
  */
-module.exports = [webpackProductionMain, webpackProductionRenderer]
+export = [webpackProductionMainConfig, webpackProductionRendererConfig]

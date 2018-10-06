@@ -1,12 +1,12 @@
 /**
  * Webpack base configuration
  */
-'use strict'
+import * as path from 'path'
+import * as webpack from 'webpack'
 
-const path = require('path')
-const webpack = require('webpack')
+export const webpackExternals = ['7zip']
 
-module.exports = {
+export const webpackBaseConfig: webpack.Configuration = {
   /**
    * @see https://webpack.js.org/configuration/output
    */
@@ -88,12 +88,7 @@ module.exports = {
    *
    * @see https://webpack.js.org/configuration/externals/#externals
    */
-  externals: [
-    /**
-     * electron-devtools-installer: 7zip
-     */
-    '7zip',
-  ],
+  externals: webpackExternals,
 
   /**
    * This is an object where each property is the name of a Node global or module.

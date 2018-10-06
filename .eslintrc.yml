@@ -1,0 +1,65 @@
+root: true
+parser: typescript-eslint-parser
+parserOptions:
+  sourceType: module
+  ecmaFeatures:
+    jsx: true
+
+plugins:
+  - typescript
+  - babel
+  - react
+  - prettier
+extends:
+  - prettier
+  - prettier/react
+rules:
+  # Babel
+  babel/no-invalid-this: error
+
+  # Prettier
+  prettier/prettier:
+    - error
+    - parser: typescript
+
+  # TypeScript
+  typescript/no-angle-bracket-type-assertion: error
+  typescript/explicit-member-accessibility: error
+  typescript/no-unused-vars: error
+  typescript/no-use-before-define:
+    - error
+    - functions: false
+      variables: false
+      typedefs: false
+  typescript/interface-name-prefix:
+    - error
+    - always
+
+  # Builtin
+  curly: error
+  no-new-wrappers: error
+  no-redeclare:
+    - error
+    - builtinGlobals: true
+  no-eval: error
+  no-sync: error
+  no-unused-expressions: error
+  no-var: error
+  prefer-const: error
+  eqeqeq:
+    - error
+    - smart
+  strict:
+    - error
+    - global
+  no-restricted-syntax:
+    - error
+    - selector: ExportDefaultDeclaration
+      message: Use of default exports is forbidden
+
+overrides:
+  - files: '*.d.ts'
+    rules:
+      strict:
+        - error
+        - never

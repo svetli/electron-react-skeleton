@@ -1,26 +1,38 @@
-#!/usr/bin/env node
+/// <reference path="./globals.d.ts" />
 
-'use strict'
+import * as path from 'path'
+import * as child_process from 'child_process'
+import * as fs from 'fs-extra'
+import * as packager from 'electron-packager'
+import chalk from 'chalk'
 
-const path = require('path')
-const chalk = require('chalk')
-const child_process = require('child_process')
-const fs = require('fs-extra')
-const packager = require('electron-packager')
-const distInfo = require('./dist-info')
-const packageInfo = require('../app/package-info')
+import {
+  getProjectRoot,
+  getAppEnvironment,
+  getDistRoot,
+  isDevelopment,
+  getBuildRoot,
+  getAppPlatform,
+} from './dist-info'
+import {
+  getProductName,
+  getCompanyName,
+  getBundleId,
+} from '../app/package-info'
+
+import { webpackExternals } from '../webpack/webpack.base'
 
 // package information
-const appPackage = require(path.join(distInfo.getProjectRoot(), 'package.json'))
+const appPackage = require(path.join(getProjectRoot(), 'package.json'))
 
 // start building process
 console.log(
-  chalk`{yellow [BUILD]} Building for {magenta '${distInfo.getAppEnvironment()}'}`
+  chalk`{yellow [BUILD]} Building for {magenta '${getAppEnvironment()}'}`
 )
 
 // cleanup
 console.log(chalk`{yellow [BUILD]} Removing old distribution files...`)
-fs.removeSync(distInfo.getDistRoot())
+fs.removeSync(getDistRoot())
 
 // copy dependencies
 console.log(chalk`{yellow [BUILD]} Copying dependencies...`)
@@ -36,19 +48,13 @@ packageApplication()
 
 function copyDependencies() {
   const appDeps = appPackage.dependencies
-  const newDeps = {}
+  const newDeps: PackageLookup = {}
   const appDevDeps = appPackage.devDependencies
-  const newDevDeps = {}
+  const newDevDeps: PackageLookup = {}
 
-  const webpackBase = require(path.join(
-    distInfo.getProjectRoot(),
-    'webpack',
-    'webpack.base'
-  ))
+  const externals = webpackExternals
 
-  const externals = webpackBase.externals
-
-  if (distInfo.isDevelopment()) {
+  if (isDevelopment()) {
     externals.push('devtron')
   }
 
@@ -67,37 +73,34 @@ function copyDependencies() {
   }
 
   const newPackage = Object.assign({}, appPackage, {
-    productName: appPackage.build.productName,
+    productName: appPackage.productName,
     dependencies: newDeps,
     devDependencies: newDevDeps,
   })
 
-  if (!distInfo.isDevelopment()) {
+  if (!isDevelopment()) {
     delete newPackage.devDependencies
   }
 
   fs.writeFileSync(
-    path.join(distInfo.getBuildRoot(), 'package.json'),
+    path.join(getBuildRoot(), 'package.json'),
     JSON.stringify(newPackage)
   )
 
-  fs.removeSync(path.resolve(distInfo.getBuildRoot(), 'node_modules'))
+  fs.removeSync(path.resolve(getBuildRoot(), 'node_modules'))
 
   if (Object.keys(newDeps).length || Object.keys(newDevDeps).length) {
     console.log(chalk`{yellow [YARN]} Installing dependencies via yarn...`)
     child_process.execSync('yarn install', {
-      cwd: distInfo.getBuildRoot(),
+      cwd: getBuildRoot(),
       env: process.env,
     })
   }
 
-  if (distInfo.isDevelopment()) {
+  if (isDevelopment()) {
     console.log(chalk`{yellow [BUILD]} Installing 7zip...`)
-    const s7zipSrc = path.resolve(
-      distInfo.getProjectRoot(),
-      'node_modules/7zip'
-    )
-    const s7zipDest = path.resolve(distInfo.getBuildRoot(), 'node_modules/7zip')
+    const s7zipSrc = path.resolve(getProjectRoot(), 'node_modules/7zip')
+    const s7zipDest = path.resolve(getBuildRoot(), 'node_modules/7zip')
 
     fs.mkdirpSync(s7zipDest)
     fs.copySync(s7zipSrc, s7zipDest)
@@ -106,12 +109,12 @@ function copyDependencies() {
 
 function copyStaticResources() {
   const platformDir = path.join(
-    distInfo.getProjectRoot(),
+    getProjectRoot(),
     'app',
     'static',
-    distInfo.getAppPlatform()
+    getAppPlatform()
   )
-  const destDir = path.join(distInfo.getBuildRoot(), 'static')
+  const destDir = path.join(getBuildRoot(), 'static')
 
   fs.removeSync(destDir)
 
@@ -121,23 +124,17 @@ function copyStaticResources() {
 }
 
 function packageApplication() {
-  const pkgOptions = {
-    name: packageInfo.getProductName(),
-    platform: distInfo.getAppPlatform(),
+  const pkgOptions: packager.Options = {
+    name: getProductName(),
+    platform: getAppPlatform() as packager.platform,
     arch: 'x64',
     asar: false,
-    out: distInfo.getDistRoot(),
-    dir: distInfo.getBuildRoot(),
+    out: getDistRoot(),
+    dir: getBuildRoot(),
     tmpdir: false,
     derefSymlinks: false,
     prune: false,
-    icon: path.join(
-      distInfo.getProjectRoot(),
-      'app',
-      'static',
-      'icons',
-      'logo'
-    ),
+    icon: path.join(getProjectRoot(), 'app', 'static', 'icons', 'logo'),
     ignore: [
       new RegExp('/node_modules/\\.bin($|/)'),
       new RegExp('/node_modules/electron($|/)'),
@@ -146,24 +143,26 @@ function packageApplication() {
     ],
 
     // MacOS specific
-    appCopyright: `Copyright ${packageInfo.getCompanyName()}`,
-    appBundleId: packageInfo.getBundleId(),
+    appCopyright: `Copyright ${getCompanyName()}`,
+    appBundleId: getBundleId(),
     appCategoryType: 'public.app-category.business',
     osxSign: false,
 
     // Windows specific
     win32metadata: {
-      CompanyName: packageInfo.getCompanyName(),
+      CompanyName: getCompanyName(),
       FileDescription: '',
       OriginalFilename: '',
-      ProductName: packageInfo.getProductName(),
-      InternalName: packageInfo.getProductName(),
+      ProductName: getProductName(),
+      InternalName: getProductName(),
     },
   }
 
   packager(pkgOptions)
     .then(paths => {
-      console.log(chalk`{green [BUILD] Successfully built to ${paths}}`)
+      console.log(
+        chalk`{green [BUILD] Successfully built to ${paths.toString()}}`
+      )
     })
     .catch(error => {
       console.error(chalk`{red [BUILD] Failed with error ${error}}`)

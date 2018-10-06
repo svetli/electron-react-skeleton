@@ -1,17 +1,13 @@
-#!/usr/bin/env node
+import * as express from 'express'
+import * as webpack from 'webpack'
+import * as webpackDevMiddleware from 'webpack-dev-middleware'
+import * as webpackHotMiddleware from 'webpack-hot-middleware'
+import * as mri from 'mri'
+import chalk from 'chalk'
+import { runElectron } from './run'
+import webpackDevConfigs = require('../webpack/webpack.development')
 
-'use strict'
-
-const webpack = require('webpack')
-const webpackDevMiddleware = require('webpack-dev-middleware')
-const webpackHotMiddleware = require('webpack-hot-middleware')
-const express = require('express')
-const electron = require('electron')
-const mri = require('mri')
-const chalk = require('chalk')
-const childProcess = require('child_process')
-const runElectron = require('./run-electron')
-const [mainConfig, rendererConfig] = require('../webpack/webpack.development')
+const webpackRendererConfig = webpackDevConfigs[1]
 
 /**
  * Setup environment
@@ -21,12 +17,20 @@ const port = args.port || process.env.PORT || 3000
 const host = args.host || 'localhost'
 const mode = args.mode || process.env.NODE_ENV || 'production'
 
+function getPublicPath(config: webpack.Configuration): string {
+  return config != null &&
+    config.output != null &&
+    config.output.publicPath != null
+    ? config.output.publicPath
+    : ''
+}
+
 if (mode === 'development') {
   /**
    * Application
    */
   const server = express()
-  const compiler = webpack(rendererConfig)
+  const compiler = webpack(webpackRendererConfig)
 
   /**
    * Webpack development middleware
@@ -38,12 +42,12 @@ if (mode === 'development') {
       /**
        * Public path to bind the middleware
        */
-      publicPath: rendererConfig.output.publicPath,
+      publicPath: getPublicPath(webpackRendererConfig),
 
       /**
-       * Display no info to console (only warnings and errors)
+       * Display no info to console (only errors)
        */
-      noInfo: true,
+      logLevel: 'error',
     })
   )
 
@@ -57,9 +61,9 @@ if (mode === 'development') {
   /**
    * Start listening...
    */
-  server.listen(port, host, error => {
+  server.listen(port, host, (error: Error | null) => {
     if (error) {
-      return console.error(chalk.red(error))
+      return console.error(error)
     }
 
     console.log(`

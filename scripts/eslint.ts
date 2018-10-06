@@ -1,29 +1,27 @@
-#!/usr/bin/env node
-
-const path = require('path')
-const eslint = require('eslint')
+import * as path from 'path'
+import { CLIEngine } from 'eslint'
 const chalk = require('chalk')
 
 const shouldFix = process.argv.indexOf('--fix') > -1
 
-const cli = new eslint.CLIEngine({
+const cli = new CLIEngine({
   cwd: path.dirname(__dirname),
   cache: true,
   fix: shouldFix,
 })
 
 const report = cli.executeOnFiles([
-  './webpack/*.js',
+  './webpack/*.ts',
   './scripts/**/*.{j,t}s?(x)',
-  './app/*.js',
+  './app/*.ts',
   './app/{src,test}/**/*.{j,t}s?(x)',
 ])
 
 if (shouldFix) {
-  eslint.CLIEngine.outputFixes(report)
+  CLIEngine.outputFixes(report)
 }
 
-console.log(cli.getFormatter()(report.results))
+console.log(cli.getFormatter('stylish')(report.results))
 
 if (report.errorCount > 0) {
   console.error(
